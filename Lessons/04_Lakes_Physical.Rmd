@@ -76,6 +76,7 @@ Lightprofiles2016 <-
         axis.text.y = element_blank(), axis.title.y = element_blank())
 print(Lightprofiles2016)
 
+
 Oxygenprofiles2016 <- 
   ggplot(Pauldata.2016, aes(x = dissolvedOxygen, y = depth, color = daynum)) +
   geom_point() +
@@ -96,20 +97,21 @@ print(Physicalprofiles2016)
 
 How do temperature profiles vary over the course of a season? What are the mechanisms for this pattern?
 
-> 
+> Surface temps generally increase over the course of a summer
 
 How do irradiance profiles vary over the course of a season? What are the mechanisms for this pattern?
 
-> 
+> Irradiance profiles are highest in the middle of the summer, and are highest near the surface
 
 How do dissolved oxygen profiles vary over the course of a season? What are the mechanisms for this pattern?
 
-> 
+> They decrease over the course of a summer, and are highest at middle water depths
+> phytoplankton in hypolimion, higher nutrient concentrations -> deep chlorophyll maximum
 
 
 ## Data Analysis
 
-### Long-term change in temperature
+### Long-term change in temperature: Paul Lake
 How much have surface temperatures increased over the period of study? Is this increase significant? Isolate surface depths and run the test for May, June, July, and August temperatures separately. Use a linear regression with year as the predictor variable and temperature as the response variable.
 
 Steps: 
@@ -122,7 +124,18 @@ Steps:
 5. Create a ggplot of surface temps by date and facet by month. Add `geom_smooth(se = FALSE, method = lm)` to the plot to display the regression line.
 
 ```{r}
+Pauldata.surf<-mutate(Pauldata, "Month"=month(sampledate))
+Pauldata.surf<-filter(Pauldata.surf, depth==0.00, 9>Month, Month>4)
 
+Paulsurf.may<- filter(Pauldata.surf, Month==5)
+Paulsurf.jun<- filter(Pauldata.surf, Month==6)
+Paulsurf.jul<- filter(Pauldata.surf, Month==7)
+Paulsurf.aug<- filter(Pauldata.surf, Month==8)
+
+lm.may<-lm(temperature_C~year4, data=Paulsurf.may)
+lm.jun<-lm(temperature_C~year4, data=Paulsurf.jun)
+lm.jul<-lm(temperature_C~year4, data=Paulsurf.jul)
+lm.aug<-lm(temperature_C~year4, data=Paulsurf.aug)
 
 
 ```
