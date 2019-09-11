@@ -16,6 +16,8 @@ editor_options:
 ## Opening Discussion
 What are the physical properties of streams and rivers? What variables might be of interest?
 
+>Discharge, velocity, geology, temperature/mixing, turbidity, dissolved oxygen, pollution/heavy metals
+
 ## Session Set Up
 
 ```{r, message = FALSE}
@@ -43,7 +45,7 @@ names(EnoDischarge.ratingcurve)[4:7] <- c("Discharge", "D.Approval.Code",
                                           "Gage.Height", "GH.Approval.Code")
 
 DvsGHplot <-
-  ggplot(EnoDischarge.ratingcurve, aes(x = Discharge, y = Gage.Height)) +
+  ggplot(EnoDischarge.ratingcurve, aes(x = Gage.Height, y = Discharge)) +
   geom_point(alpha = 0.5) 
 print(DvsGHplot)
 ```
