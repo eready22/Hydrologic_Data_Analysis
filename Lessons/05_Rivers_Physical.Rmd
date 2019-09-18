@@ -206,11 +206,11 @@ How does the magnitude of discharge compare for these rivers?
 
 Which of these rivers have a seasonal cycle of discharge? How might you explain the presence and timing of seasonal cycles based on climatic conditions?
 
->
+> Nehalem, Bitterroot, and Verde have clear seasonal cycles.
 
 Hypothetical question: If you wanted to create a ggplot using facets instead of `plot_grid`, how would you go about wrangling your dataset differently? 
 
->
+>Only 1 plot, facet by location
 
 ## Defining "typical" discharge pattern
 Let's take the Bitterroot River, which displays a clear seasonal cycle. Let's define the median discharge on a given day of year and overlay this onto the range experienced. We will take a longer period of record this time.

@@ -16,6 +16,8 @@ editor_options:
 ## Opening Discussion
 How is climate change impacting discharge in streams and rivers? What are the new and ongoing challenges faced by these impacts in watersheds?
 
+> Changing winter climates and snowpack, changing precipitation patterns, changing evaporation patterns, increasing water temperatures, decreasing dissolved oxygen, sea level rise -> saltwater intrusion
+
 ## Session Set Up
 
 ```{r, message = FALSE}
@@ -137,11 +139,11 @@ Eno.RImodel$coefficients[1] + Eno.RImodel$coefficients[2]*log(500)
 
 What differences did you see for the recurrence intervals built under different periods of record? How would your prediction of flood events differ if you were to use these models for forecasting purposes? 
 
->
+> The regression using the historical data underpredicted compared to the regression that used the full data set. This implies that in the years since 1993, we've had comparably higher yearly maximum discharges. 
 
 What would you recommend for a watershed manager seeking to build the most accurate recurrence interval model for the Eno River?
 
-> 
+> Use a model that accounts for increasing yearly maximums
 
 
 ### Examining the effects of urbanization on discharge
@@ -163,7 +165,33 @@ SaladoPlot <-
          xlab("Year")
 print(SaladoPlot)
 
+SaladoDischarge<-mutate(SaladoDischarge, Year=year(Date))
+
 # add more code here: 
+
+Salado.Recurrence.First<- SaladoDischarge%>%
+  filter(Year<1990)%>%
+  group_by(Year)%>%
+  summarise(PeakDischarge = max(Discharge)) %>% 
+  mutate(Rank = rank(-PeakDischarge), 
+         RecurrenceInterval = (length(Year) + 1)/Rank, 
+         Probability = 1/RecurrenceInterval)
+
+Salado.Recurrence.Last<- SaladoDischarge%>%
+  filter(Year>1989)%>%
+  group_by(Year)%>%
+  summarise(PeakDischarge = max(Discharge)) %>% 
+  mutate(Rank = rank(-PeakDischarge), 
+         RecurrenceInterval = (length(Year) + 1)/Rank, 
+         Probability = 1/RecurrenceInterval)
+
+Salado.Recurrence.Plot<-ggplot()+
+  geom_point(data = Salado.Recurrence.First, aes(x=RecurrenceInterval, y=PeakDischarge), color="#02818a")+
+  geom_point(data = Salado.Recurrence.Last, aes(x=RecurrenceInterval, y=PeakDischarge))
+
+print(Salado.Recurrence.Plot)
+
+  
 
 ```
 

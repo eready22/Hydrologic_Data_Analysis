@@ -128,6 +128,8 @@ lm.jun<-lm(temperature_C~year4, data=Petersurf.jun)
 lm.jul<-lm(temperature_C~year4, data=Petersurf.jul)
 lm.aug<-lm(temperature_C~year4, data=Petersurf.aug)
 
+
+##need to check significance
 print("Degree increase predicted in May")
 lm.may$coefficients["year4"]*32
 print("Degree increase predicted in Jun")
