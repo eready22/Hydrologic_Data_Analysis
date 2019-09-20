@@ -15,15 +15,21 @@ editor_options:
 
 ## Opening Discussion
 What is water quality? What are some of the things it encompasses? 
+<<<<<<< HEAD
 pH, turbidity, DO, heavy metals, nutrient levels, bacteria presence
+=======
+
+>>>>>>> 096cc38c2f3f68492572892a483a0b1d090a9cd0
 ## Session Set Up
 
 ```{r, message = FALSE}
 getwd()
+
 packages <- c("dataRetrieval", "tidyverse", "cowplot", "lubridate")
 invisible(suppressPackageStartupMessages(lapply(packages, 
                                                 library, 
                                                 character.only = TRUE))) 
+
 theme_set(theme_classic())
 ```
 
@@ -35,11 +41,20 @@ theme_set(theme_classic())
 
 Why are these important measures of water quality?
 
+
 > pH and specific conductance determine the suitability of habitat for life and how the stream interacts with the rest of its environment
 
 What types of disturbances can impact these parameters?
 
 > Pollution, acid rain
+=======
+>
+
+What types of disturbances can impact these parameters?
+
+>
+
+>>>>>>> 096cc38c2f3f68492572892a483a0b1d090a9cd0
 ## How does mining impact specific conductance and pH?
 
 Let's import data from two sites in West Virginia. One site, Twelvepole Creek, experienced comparatively less mining in its water shed than the other, the Kanawha river. We will read in all of the data, but will start by looking at just data from before 1977.
@@ -49,7 +64,11 @@ dat.raw <- readNWISqw(siteNumbers = c("03201300","03206790"), #Kanawha river & T
                      parameterCd = c("00095", "00400"), # Specific Conductance & pH
                      startDate = "",
                      endDate = "")
+
+
 str(dat.raw, give.attr = FALSE)
+
+
 dat <- dat.raw %>%
   select(Site = site_no, 
          Date = sample_dt,
@@ -61,39 +80,60 @@ dat <- dat.raw %>%
   rename(SpC = '00095', pH = '00400') %>%
   mutate(Site = case_when(Site == "03201300" ~ "Kanawha River",
                           Site == "03206790" ~ "Twelvepole Creek"))
+
+
 dat.early <- dat %>%
   filter(Date < "1977-01-01")
+
+
 ```
 
 Now let's compare the pH and specific conductance of the two rivers.
 
 ```{r view_pH_SpC}
+
 pH.plot <- ggplot(dat.early, aes(x = Date, y = pH, color = Site)) +
   geom_line() +
   scale_color_manual(values = c("steelblue4", "darkorange4")) +
   ggtitle("pH of Two West Virginia Rivers 1956:1976")
+
 print(pH.plot)
+
+
 pH.plot.2 <- ggplot(dat.early, aes(x = Date, y = pH, color = Site)) +
   geom_smooth() +
   geom_point() +
   scale_color_manual(values = c("steelblue4", "darkorange4")) +
     ggtitle("pH of Two West Virginia Rivers 1956:1976")
+
+
 print(pH.plot.2)
+
+
 SpC.plot <- ggplot(dat.early, aes(x = Date, y = SpC, color = Site)) +
   geom_line() +
   labs(y = expression("Specific Conductance ("*mu*S * cm**-1*")")) +
   scale_color_manual(values = c("steelblue4", "darkorange4")) +
     ggtitle("Specific Conductance of Two West Virginia Rivers 1956:1976")
+
 print(SpC.plot)
 ```
 
 What differences do you see?
+
 
 > Huge differences in sampling, lots more sampling in Kanawha. In Kanawha, there's a period from 1963-1970 where they sampled frquently and the results were all over the place. Higher peaks of specific conductance in Kanawha.
 
 Why might mining be causing the changes you see?
 
 > Mining increased scrutiny of watershed and added minerals to the river.
+=======
+>
+
+Why might mining be causing the changes you see?
+
+>
+
 
 What is the data frequency of these water quality samples? Why don't we have daily values? How does this inform your interpretation of the data?
 
@@ -108,26 +148,40 @@ pH.plot <- ggplot(dat, aes(x = Date, y = pH, color = Site)) +
   geom_vline(xintercept = 1977, color = "grey", alpha = 0.8, lwd = 2, lty = 2) + 
   scale_color_manual(values = c("steelblue4", "darkorange4")) +
   ggtitle("pH of Two West Virginia Rivers 1956:2000")
+
+
 print(pH.plot)
+
+
 pH.plot.2 <- ggplot(dat, aes(x = Date, y = pH, color = Site)) +
   geom_smooth() +
   geom_point() +
   geom_vline(xintercept = 1977, color = "grey", alpha = 0.8, lwd = 2, lty = 2) + 
   scale_color_manual(values = c("steelblue4", "darkorange4")) +
     ggtitle("pH of Two West Virginia Rivers 1956:2000")
+
+
+
 print(pH.plot.2)
+
+
 SpC.plot <- ggplot(dat, aes(x = Date, y = SpC, color = Site)) +
   geom_line() +
   geom_vline(xintercept = 1977, color = "grey", alpha = 0.8, lwd = 2, lty = 2) + 
   labs(y = expression("Specific Conductance ("*mu*S * cm**-1*")")) +
   scale_color_manual(values = c("steelblue4", "darkorange4")) +
     ggtitle("Specific Conductance of Two West Virginia Rivers 1956:2000")
+
 print(SpC.plot)
 ```
 
 Discuss with your group about the differences you see.
 
+
 > Remediation was successful at eliminating very acidic pH values and very high specific conductance values in the Kanawha River. It is strange that Twelvepole became more acidic.
+
+>
+
 
 ## Were remediation efforts successful?
 
@@ -141,8 +195,12 @@ Kanawha.yearly.averages <- dat %>%
   summarize_all(mean) %>%
   mutate(bin = case_when(Year %in% c(1958:1977) ~ "Pre",
                          Year %in% c(1978:1997) ~ "Post")) 
+
+
 Kanawha.early <- Kanawha.yearly.averages %>% filter(Year %in% c(1958:1977))
 Kanawha.late <- Kanawha.yearly.averages %>% filter(Year %in% c(1978:1997))
+
+
 histograms <- ggplot(Kanawha.yearly.averages %>% filter(!is.na(bin)), 
        aes(x = SpC, fill = bin)) +
   geom_histogram(alpha = 0.8) +
@@ -153,7 +211,10 @@ histograms <- ggplot(Kanawha.yearly.averages %>% filter(!is.na(bin)),
                     name="",
                     breaks=c("Pre", "Post"),
                     labels=c("20 years before SMCRA", "20 years after SMCRA"))
+
+
 print(histograms)
+
 densityplots <- ggplot(Kanawha.yearly.averages %>% filter(!is.na(bin)), 
        aes(x = SpC, fill = bin)) +
   geom_density(alpha = 0.8) +
@@ -164,29 +225,43 @@ densityplots <- ggplot(Kanawha.yearly.averages %>% filter(!is.na(bin)),
                     name="",
                     breaks=c("Pre", "Post"),
                     labels=c("20 years before SMCRA", "20 years after SMCRA"))
+
+
 print(densityplots)
+
 x <- (Kanawha.yearly.averages %>% filter(bin == "Pre"))$SpC
 y <- (Kanawha.yearly.averages %>% filter(bin == "Post"))$SpC
+
 qqnorm(x, las = 1); qqline(x)
 qqnorm(y, las = 1); qqline(y)
+
 cat("Length x:", length(x), "\n", "Length y:", length(y))
+
+
 t.test(x, y)
 ```
 
 How would you communicate these results to a manager? 
 
 > The Surface Mining regulations from 1977 had a significant difference on the water quality in the Kanawha River. This means that mining has an impact on water quality, and that the Surface Mining Act significantly changed the water quality measurements.
+=======
+>
 
 What can you say with data visualization that you can't say with just the statistical tests?
 
 >
+
 
 ## How have individual ions changed over the this timeperiod?
 
 Let's look at the Manganese data for the Kanawha river.
 
 ```{r Manganese_data}
+
+
 Manganese.raw <- readNWISqw('03201300', parameterCd = '01055')
+
+
 Manganese.dat <- Manganese.raw %>%
  select(Date = sample_dt, Manganese_ugL = result_va)
   
@@ -196,6 +271,9 @@ Manganese.plot <- ggplot(Manganese.dat, aes(x = Date, y = Manganese_ugL)) +
   geom_vline(xintercept = 1977, color = "grey", alpha = 0.8, lwd = 2, lty = 2) + 
   labs(y = expression("Manganese ("*mu*g*l^-1*")")) +
   ggtitle("Manganese Concentrations in the Kanawha River")
+
+
+
 print(Manganese.plot)
 ```
 
@@ -206,11 +284,14 @@ Try plotting the manganese data with points instead of lines. Which do you prefe
 EPA drinking water standards for Manganese are 0.05 *_mg/L_*. How does the Kanawha stack up?
 
 > It is often higher than the EPA standard
+=======
+>
+
 
 Take some time to look at other ions as well. Some suggestions are sulfate (```00945```), nitrate (```71851```), and iron (```71885```), or use the ```whatNWISdata()``` function to find others! EPA drinking water regulations can be found here: https://www.epa.gov/ground-water-and-drinking-water/national-primary-drinking-water-regulations. Pay close attention to units! Information about parameter codes can be found in the dataframe ```parameterCdFile```.
 
 ```{r other_ion_data}
-whatNWISdata()
+
 
 ```
 
@@ -220,8 +301,10 @@ whatNWISdata()
 Based on the data you've looked at today, what are some of the water quality impacts of mining?  What other disturbances might cause similar changes?
 
 >
+
 # References
 
 Water Quality in the Kanawha-New River Basin, West Virginia, Virginia, and North Carolina, 1996–98 (USGS): https://pubs.usgs.gov/circ/circ1204/pdf/section2.pdf
 
 National Primary Drinking Water Regulations (EPA): https://www.epa.gov/ground-water-and-drinking-water/national-primary-drinking-water-regulations
+
