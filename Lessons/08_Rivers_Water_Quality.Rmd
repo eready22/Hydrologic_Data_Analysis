@@ -53,7 +53,7 @@ Where and when do you think the biggest risks from harmful bacteria are?
 
 Measuring microbiogial indicators is more expensive and time consuming than some other water quality metrics. Where and when would you measure these?
 
->
+> downstream of treatment plants, drinking
 
 ## How have improvements in sewage treatment affected water quality?
 
@@ -162,11 +162,11 @@ print(Microbes.plot)
 
 How would you use all of this data to talk about changes in microbial water quality from 1970 to 2000? What are the challenges?
 
->
+> think about how 0.45 and 0.7 filter sizes relate to each other
 
 Do you think water quality has improved between 1970 and 2000? Why or why not?
 
->
+> Yes, at least the maximum events
 
 The city of Lawrence, MA is downstream of Lowell and gets its drinking water from the Merrimack River. Use the federal drinking water standard for Total Coliforms (https://www.epa.gov/ground-water-and-drinking-water/national-primary-drinking-water-regulations#Microorganisms) to comment on whether or not this water necessarily needs to be treated for bacteria.
 
@@ -184,7 +184,7 @@ monthly.obs <- microb.dat %>%
 coli.monthly.summaries <- microb.dat %>%
   mutate(month = month(Date)) %>%
   group_by(month) %>%
-  select(month, Total.coli) %>%
+  select(month, F.coli.7) %>%
   summarize_all(funs(Median = median(., na.rm = T),
                  quant25 = quantile(., .25, na.rm = T),
                  quant75 = quantile(., .75, na.rm = T)))
