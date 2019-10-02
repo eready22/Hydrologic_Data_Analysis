@@ -169,9 +169,9 @@ LAGOStrophic$trophic.class <-
   factor(LAGOStrophic$trophic.class,
          levels = c("Oligotrophic", "Mesotrophic", "Eutrophic", "Hypereutrophic"))
 
-# LAGOStrophic$season <- 
-#   factor(LAGOStrophic$season,
-#          levels = c("Spring", "Summer", "Fall", "Winter"))
+ LAGOStrophic$season <- 
+   factor(LAGOStrophic$season,
+          levels = c("Spring", "Summer", "Fall", "Winter"))
 
 #scales::show_col(colormap(colormap = colormaps$magma, nshades=16))
 ```
