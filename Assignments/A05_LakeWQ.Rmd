@@ -1,6 +1,6 @@
 ---
 title: "Assignment 5: Water Quality in Lakes"
-author: "Student Name"
+author: "Ethan Ready"
 output: pdf_document
 geometry: margin=2.54cm
 editor_options: 
