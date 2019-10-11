@@ -17,13 +17,15 @@ editor_options:
 
 High frequency data is usually defined as frequencies significantly lower than daily (e.g. 5-minute, 15-minute, 1 hr etc). What types of hydrological and biological processes happen on this timescale that we might want to investigate?
 
->
+> daily processes like flash floods, photosynthesis->dissolved oxygen, contaminents, temperature
 
 
 ## Session Set Up
 
 ```{r, message = FALSE}
 getwd()
+
+library(tidyverse)
 
 packages <- c(
   "dataRetrieval", "tidyverse", "cowplot", "EcoHydRology", "xts", "dygraphs"
@@ -42,17 +44,17 @@ dischargedatTFC2018 <- readNWISuv(
   parameterCd = "00060",
   startDate = "2018-01-01", 
   endDate = "2019-01-01"
-  ) %>% 
-  renameNWISColumns()
-
+  )
+dischargedatTFC2018<-renameNWISColumns(dischargedatTFC2018)
 
 dischargedatEC2018 <- readNWISuv(
   site = "0208675010", #Ellerbe Creek at Club Boulevard at Durham, NC
   parameterCd = "00060", 
   startDate = "2018-01-01", 
   endDate = "2019-01-01"
-  ) %>% 
+  )%>%
   renameNWISColumns()
+  
 
 
 plot_grid(
@@ -72,7 +74,7 @@ plot_grid(
 
 The shape and size of river hydrographs following rain events can tell us how water moves through a watershed. Once rain falls, how does water get to a stream? What would the streamflow do?
 
->
+>overland flow, groundwater, fall in river channel. Streamflow spikes.
 
 
 _"Hydrograph separation is one of the most desperate analysis techniques in use in hydrology" - Hewlett & Hibbert 1967_
@@ -122,7 +124,7 @@ Repeat this analysis for Ellerbe Creek. How do the percentages compare?
 
 What does this mean physically about the watershed?
 
->
+> urban stream syndrome: hydrologic flashiness, eroded/deeper, water quality parameter problems
 
 ## Hydrologic Flashiness
 

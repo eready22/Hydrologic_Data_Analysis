@@ -36,7 +36,7 @@ options(scipen = 100)
 # Load LAGOSNE data into R session
 LAGOSdata <- lagosne_load()
 # If the lagosne_get function has not worked, use this code: 
-# load(file = "./Data/Raw/LAGOSdata.rda")
+# load(file = "/Users/ethanready/Hydrologic_Data_Analysis/Data/Raw/LAGOSdata.rda")
 
 # What types of data are available in the database?
 names(LAGOSdata)
@@ -60,7 +60,14 @@ Wrangle LAGOSdata so that you have a new data frame that includes TN, TP, your f
 
 ```{r}
 # Wrangle data here.
-LAGOS_predictors<-join(LAGOSdata$state, LAGOSdata$locus, by = "state_zoneid" )
+LAGOS_predictors<-left_join(LAGOSdata$state, LAGOSdata$locus, by = "state_zoneid" )%>%
+  left_join(LAGOSdata$epi_nutr, by = "lagoslakeid")%>%
+  mutate(sampleyear= year(sampledate), 
+         season = as.factor(quarter(sampledate, fiscal_start = 12)))%>%
+  select(state, sampleyear, season, chla, secchi, tn, tp, lagoslakeid)%>%
+  drop_na()
+
+levels(LAGOS_predictors$season) <- c("Winter", "Spring", "Summer", "Fall")
 ```
 
 Examine potential correlations among your predictor variables. If your predictor variables are highly correlated with each other, your model will suffer from *multicollinearity,* essentially that two or more of your predictor variables provide redundant information. Model fit and accuracy of model coefficients suffer when multicollinearity is present. 
@@ -68,17 +75,22 @@ Examine potential correlations among your predictor variables. If your predictor
 1. Create a correlation plot for your 7 variables of interest (TN, TP, and the five predictor variables). What patterns do you see? (hint: function `corrplot` in the corrplot package. I like to use `upper = "ellipse"` inside the function).
 
 ```{r}
-
+nutr<-cor(LAGOS_predictors[,c(2,4:7)])
+corrplot(nutr, method = "ellipse", type = "upper")
 ```
 
 What patterns do you see?
 
->
+> secchi 
 
 2. Create two linear regression models (hint: function `lm`) to predict TN and TP using your five predictor variables. 
 
 ```{r}
+lm.tn<-lm(tn~chla+season+sampleyear+secchi+state, LAGOS_predictors)
+lm.tp<-lm(tp~chla+season+sampleyear+secchi+state, LAGOS_predictors)
 
+lm.tn
+lm.tp
 ```
 
 How much variance in TN and TP is accounted for by your full model?
