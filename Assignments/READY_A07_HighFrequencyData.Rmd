@@ -1,6 +1,6 @@
 ---
 title: "Assignment 7: High Frequency Data"
-author: "Student Name"
+author: "Ethan Ready"
 output: pdf_document
 geometry: margin=2.54cm
 editor_options: 
@@ -28,14 +28,45 @@ The completed exercise is due on 16 October 2019 at 9:00 am.
 
 
 ```{r setup}
+getwd()
+
+library(devtools)
+library(tidyverse)
+
+packages <- c(
+  "tidyverse", 
+  "StreamPULSE", 
+  "streamMetabolizer"
+  )
+invisible(
+  suppressPackageStartupMessages(
+    lapply(packages, library, character.only = TRUE)
+    )
+  ) 
+
+theme_set(theme_classic(base_size = 12))
 
 ```
 
 
 4. Download data from the Stream Pulse portal using `request_data()` for the Kansas River, ("KS_KANSASR"). Download the discharge (`Discharge_m3s`), disolved oxygen (`DO_mgL`) and nitrate data (`Nitrate_mgL`) for the entire period of record
 
+```{r}
+Kansas.Dat<-request_data(
+  sitecode = "KS_KANSASR",
+  variables = c("Discharge_m3s", "DO_mgL", "Nitrate_mgL"),
+)
+
+```
+
+
 5. Reformat the data into one dataframe with columns DateTime_UTC, DateTime_Solar (using `convert_UTC_to_solartime()`), SiteName, DO_mgL, Discharge_m3s, and Nitrate_mgL.
 ```{r Datadownload}
+Kansas.df<-select(Kansas.Dat[[1]], DateTime_UTC, value, variable)
+  
+Kansas.df<-spread(Kansas.df, value = value, key = variable)
+  
+Kansas.df<- mutate(Kansas.df, DateTime_Solar = convert_UTC_to_solartime(DateTime_UTC, Kansas.Dat[[2]]$lon))
 
 
 ```
@@ -43,19 +74,52 @@ The completed exercise is due on 16 October 2019 at 9:00 am.
 6. Plot each of the 3 variables against solar time for the period of record
 
 ```{r}
+ggplot(Kansas.df, aes(x=DateTime_Solar))+
+  geom_point(aes(y=DO_mgL))+
+  labs(x="Solar Date and Time", y= "Dissolved Oxygen (mg/L)")
 
+ggplot(Kansas.df, aes(x=DateTime_Solar))+
+  geom_point(aes(y=Nitrate_mgL))+
+  labs(x="Solar Date and Time", y= "Nitrate (mg/L)")
+  
+ggplot(Kansas.df, aes(x=DateTime_Solar))+  
+  geom_point(aes(y=Discharge_m3s))+
+  labs(x="Solar Date and Time", y= "Discharge (m3/s)")
 ```
 
 7. How will you address gaps in these dataseries?
 
->
+> I will omit all rows with missing data
 
 8. How does the daily amplitude of oxygen concentration swings change over the season? What might cause this?
 
->
+> It's higher in months with more sunlight because more primary production is happening.
 
 ## Baseflow separation
 9. Use the `EcoHydRology::BaseflowSeparation()` function to partition discharge into baseflow and quickflow, and calculate how much water was exported as baseflow and quickflow for this time period. Use the DateTime_UTC column as your timestamps in this analysis.
+
+```{r}
+Kansas.no.na<-na.omit(Kansas.df)
+
+Kansas.baseflow<-EcoHydRology::BaseflowSeparation(Kansas.no.na$Discharge_m3s,
+                                    filter_parameter = 0.925, 
+                                    passes = 3)
+
+Kansas.new<-cbind(Kansas.no.na, Kansas.baseflow)
+
+Kansas.flow.diff<-mutate(Kansas.new, timestep = c(diff(as.numeric(DateTime_UTC)),NA_real_),
+         baseflow.gross = bt*timestep,
+         quickflow.gross = qft*timestep)
+
+Kansas.flow.diff<-summarize(Kansas.flow.diff, BF.total = sum(baseflow.gross, na.rm = TRUE),
+            QF.total = sum(quickflow.gross, na.rm = TRUE),
+            flow.total = BF.total+QF.total,
+            BF.percent = BF.total/flow.total,
+            QF.percent = QF.total/flow.total)
+
+  
+```
+
 
 The `package::function()` notation being asked here is a way to call a function without loading the library. Sometimes the EcoHydRology package can mask tidyverse functions like pipes, which will cause problems for knitting. In your script, instead of just typing `BaseflowSeparation()`, you will need to include the package and two colons as well.
 
@@ -63,51 +127,58 @@ The `package::function()` notation being asked here is a way to call a function 
 
 
 ```{r}
-
+ggplot(Kansas.new, aes(x = DateTime_UTC))+
+  geom_line(aes(y = Discharge_m3s))+
+  geom_line(aes(y = bt), color = "pink")+
+  geom_line(aes(y = qft), color = "steelblue")
 ```
 
 
 11. What percentage of total water exported left as baseflow and quickflow from the Kansas River over this time period?
 
->
+> Baseflow: 95.7%, Quickflow: 4.3%
 
 12. This is a much larger river and watershed than the 2 we investigated in class. How does the size of the watershed impact how flow is partitioned into quickflow and baseflow? 
 
->
+> A larger watershed probably has more baseflow and isn't as volatile as the Eno or other smaller creeks. A big watershed means that a storm probably doesn't hit the whole area at once, allowing a tributary to stabilize others that may be hit by quickflow during a big storm.
 
 13. The site we are looking at is also further down in its river network (i.e. instead of being a headwater stream, this river has multiple tributaries that flow into it). How does this impact your interpretation of your results?
 
->
+> Each tributary will react to different regional storms, minimizing the impact that one storm has on a watershed.
 
 ## Chemical Hysteresis
 
 14. Create a ggplot of flow vs. nitrate for the large storm in May (~May 1 - May 20). Use color to represent Date and Time.
 
 ```{r}
+Kansas.storm<-
+  filter(Kansas.no.na, DateTime_UTC> "2018-05-1" & DateTime_UTC < "2018-05-31")
 
+ggplot(Kansas.storm, aes(x = Nitrate_mgL, y = Discharge_m3s, color = DateTime_Solar))+
+  geom_point()
 ```
 
 15. Does this storm show clockwise or counterclockwise hysteresis? Was this storm a flushing or diluting storm?
 
->
+> I'm confused, because in class we plotted discharge on the x and nitrate on the y, but this question asked for them flipped. In class, we discussed that a countrclockwise loop was a diluting storm because it suggests that quickflow has lower nutrient levels, which is what this storm appears to be. If its actually supposed to be discharge on y then my answer would be flipped.
 
 16. What does this mean for how nitrate gets into the river from the watershed?
 
->
+> This would mean that more nitrate gets into the watershed from baseflow.
 
 ## Reflection
 17. What are 2-3 conclusions or summary points about high frequency data you learned through your analysis?
 
->
+> EcoHydRology masks pipes. It's important which axis you plot things on.
 
 18. What data, visualizations, and/or models supported your conclusions from 17?
 
-> 
+> The Hysterysis plot
 
 19. Did hands-on data analysis impact your learning about high frequency data relative to a theory-based lesson? If so, how?
 
->
+> yes I understood how frustrating R can be
 
 20.	How did the real-world data compare with your expectations from theory?
 
->
+> It made sense once I looked at it, but I didn't really have many expectations going in.
